@@ -1,10 +1,10 @@
 import promptSync from 'prompt-sync';
 const prompt = promptSync();
 
+
 function getVertex(graph) {
   return graph.length;
 } //функція визначення кількості вершин
-
 function getEdges(graph) {
   let countOfEdges = 0;
   for(let i = 0; i < graph.length; i++) {
@@ -53,8 +53,8 @@ function shortestPathDijkstra(graph, start, end) { //функція алгори
 
   if(distances[end] === Number.MAX_VALUE) return {distance:'Не можна знайти відстань', path: 0};
   if(distances[end] === 0 || Number.isInteger(distances[end])) return { distance: distances[end], path };
-  return { distance: distances[end].toFixed(2), path };
 
+  return { distance: distances[end].toFixed(2), path };
 }
 
 function BellmanFord(graph, start)  { //функція алгоритму Беллмана-Форда
