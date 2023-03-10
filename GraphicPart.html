@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>КП-2</title>
+
+</head>
+<body>
+<script type="text/javascript">
+  function new_layer(pic){
+    let layer = document.createElement('div');
+    layer.style.width = '700px';
+    layer.style.height = '550px';
+    layer.style.backgroundImage = 'url('+pic+')';
+    document.getElementById('container').appendChild(layer);
+  }
+
+</script>
+<script src="index.js"></script>
+<script type="text/javascript">
+  function addScript(src) {
+    let script = document.createElement('script');
+    script.src = src;
+    script.async = false; // чтобы гарантировать порядок
+    document.head.appendChild(script);
+  }
+  function BellmanFord2(graph, start)  { //функція алгоритму Беллмана-Форда
+    let distances = {}; //створюємо об'єкт дистанцій
+    let routes = {}; //створюємо об'єкт для маршрутів
+    let len = graph.length;
+    for(let i = 0; i < len; i++) {
+      for(let j = 0; j < len; j++) {
+        if(graph[i][j] === -1) graph[i][j] = 0; //зміна елементів матриці з -1 на 0
+      }
+    }
+
+    //Заповнюємо масиви дистанцій та візиту
+    for (let i = 0; i < len; i++) {
+      distances[i] = Infinity; //заповнюємо всі ключі об'єктів
+      routes[i] = [];
+    }
+    distances[start] = 0; //призначаємо початковій дистанції в стартовій точці - 0
+    routes[start].push(start+1); // додаємо початковий маршрут в об'єкт
+
+    for (let i = 0; i < len - 1; i++) {
+      for (let j = 0; j < len; j++) { //проходимо по місцю
+        for (let k = 0; k < len; k++) { //проходимо по кожній вершині
+          if (graph[j][k] !== 0) {
+            let distance = graph[j][k];
+            if (distances[j] + distance < distances[k]) { //порівнюємо дистанції сусіднього вузла з поточною дистанцією
+              distances[k] = distances[j] + distance;
+              routes[k] = [...routes[j], k+1];
+            }
+          }
+        }
+      }
+    }
+    document.getElementById('button').addEventListener('click', function (e){
+      document.getElementById('distances').value = distances;
+      document.getElementById('route').value = routes;
+    })
+    return {distances, routes};
+
+  }
+
+
+
+
+</script>
+<div>
+  <div id="container" style="width:700px;height:550px;"></div>
+  <input type = "text" name = "target"   value = "" id="distances">
+  <input type = "text" name = "target"   value = "" id="route">
+  <input type="button" value="Алгоритм Беллмана-Форда" id="button">
+
+  <!--input type="button" onclick="new_layer('graph.png')" value="Алгоритм Беллмана-Форда" -->
+</div>
+<div>
+  <div id="container1" style="width:700px;height:550px;"></div>
+  <input type="button" onclick="new_layer('graph.png')" value="Алгоритм Дейкстри">
+</div>
+</body>
+</html>
