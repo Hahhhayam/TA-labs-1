@@ -4,16 +4,6 @@ function main(variant, startPoint) {
     return graph.length;
   } //функція визначення кількості вершин
 
-  function getEdges(graph) {
-    let countOfEdges = 0;
-    for(let i = 0; i < graph.length; i++) {
-      for(let j = 0; j < graph.length; j++) {
-        if(graph[i][j] > 0 ) countOfEdges++;
-      }
-    }
-    return countOfEdges / 2;
-  } //функція визначення кількості ребер
-
   function shortestPathDijkstra(graph, start, end) { //функція алгоритму Дейкстри
     const len = graph.length; //визначаємо довжину масиву
     const visited = new Array(len).fill(false); //створення масиву візитів, початок заповнюємо 0 або false
@@ -117,8 +107,7 @@ function main(variant, startPoint) {
 
 
   let result =
-      `Кількість вершин графу: ${getVertex(Places)}\n` +
-      `Кількість ребер графу: ${getEdges(Places)}\n`;
+      `Кількість вершин графу: ${getVertex(Places)}\n`;
 
   switch (variant) {
     case 1:
