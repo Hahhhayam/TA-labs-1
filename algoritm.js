@@ -1,0 +1,215 @@
+import promptSync from 'prompt-sync';
+const prompt = promptSync();
+
+function getVertex(graph) {
+  return graph.length;
+} //функція визначення кількості вершин
+
+function getEdges(graph) {
+  let countOfEdges = 0;
+  for(let i = 0; i < graph.length; i++) {
+    for(let j = 0; j < graph.length; j++) {
+      if(graph[i][j] > 0 ) countOfEdges++;
+    }
+  }
+  return countOfEdges;
+} //функція визначення кількості ребер
+
+function shortestPathDijkstra(graph, start, end) { //функція алгоритму Дейкстри
+  const len = graph.length; //визначаємо довжину масиву
+  const visited = new Array(len).fill(false); //створення масиву візитів, початок заповнюємо 0 або false
+  const distances = new Array(len).fill(Number.MAX_VALUE); //масив відстаней, заповнюємо спочатку максимальними значеннями числа
+  const previous = new Array(len).fill(null); //для знаходження маршруту створюємо масив для збереження минулого елементу
+  start--;
+  end--;
+  distances[start] = 0;
+
+  for (let i = 0; i < len - 1; i++) {
+    let current = null;
+    for (let j = 0; j < len; j++) {
+      if (!visited[j] && (current === null || distances[j] < distances[current])) { //призначення нинішнього рядку
+        current = j;
+      }
+    }
+
+    visited[current] = true; //відмічаємо в масиві візитів, що ми потрапили в нинішню точку
+
+    for (let j = 0; j < len; j++) {
+      const distance = graph[current][j]; //створюємо константу, яка дорівнює нинішньому елементу нинішнього рядка
+      if (distance > 0 && distances[current] + distance < distances[j]) { //якщо знаходимо дистанцію, яка буде менше
+        distances[j] = distances[current] + distance;
+        previous[j] = current; //зберігаємо в масиві минулих елементів нинішній
+      }
+    }
+  }
+
+  const path = []; //створюємо масив для знаходження маршруту
+  let current = end; //нинішня точка - кінцева
+  while (current !== start) {
+    path.unshift(current); //додаємо в початок нашу нинішню точку
+    current = previous[current]; //нинішня точка = минулій точці
+  }
+  path.unshift(start); //додаємо вкінці нашу початкову точку
+
+  if(distances[end] === Number.MAX_VALUE) return {distance:'Не можна знайти відстань', path: 0};
+  if(distances[end] === 0 || Number.isInteger(distances[end])) return { distance: distances[end], path };
+  return { distance: distances[end].toFixed(2), path };
+
+}
+
+function BellmanFord(graph, start)  { //функція алгоритму Беллмана-Форда
+  let distances = {}; //створюємо об'єкт дистанцій
+  let routes = {}; //створюємо об'єкт для маршрутів
+  let len = graph.length;
+  for(let i = 0; i < len; i++) {
+    for(let j = 0; j < len; j++) {
+      if(graph[i][j] === -1) graph[i][j] = 0; //зміна елементів матриці з -1 на 0
+    }
+  }
+
+  //Заповнюємо масиви дистанцій та візиту
+  for (let i = 0; i < len; i++) {
+    distances[i] = Infinity; //заповнюємо всі ключі об'єктів
+    routes[i] = [];
+  }
+  distances[start] = 0; //призначаємо початковій дистанції в стартовій точці - 0
+  routes[start].push(start+1); // додаємо початковий маршрут в об'єкт
+
+  for (let i = 0; i < len - 1; i++) {
+    for (let j = 0; j < len; j++) { //проходимо по місцю
+      for (let k = 0; k < len; k++) { //проходимо по кожній вершині
+        if (graph[j][k] !== 0) {
+          let distance = graph[j][k];
+          if (distances[j] + distance < distances[k]) { //порівнюємо дистанції сусіднього вузла з поточною дистанцією
+            distances[k] = distances[j] + distance;
+            routes[k] = [...routes[j], k+1];
+          }
+        }
+      }
+    }
+  }
+  return {distances, routes};
+}
+
+let Places = [ //створюємо масив наших шляхів
+  [0, 2, 1.7, 0.9, -1, -1, 5, 1, 1.3, -1, 2.6],
+  [2, 0, 0.6, 1.3, -1, -1 , -1 , -1 ,0.95, -1, 0.6 ],
+  [1.7, -1, 0, 1, -1, -1, -1,-1, 0.65, -1, -1 ],
+  [0.9, 1.3, 1, 0, -1, -1, -1, 1, 0.55, -1, -1],
+  [-1, -1, 0.5, -1, 0, -1, -1, -1, -1, 0.85, -1 ],
+  [-1, -1, -1, -1, -1, 0, -1, -1, -1, -1, -1],
+  [5, -1, -1, -1, -1, -1, 0, -1, -1, -1, -1 ],
+  [-1, -1,-1, -1, 1.1, -1, -1, 0, -1, -1, -1],
+  [1.3, 0.95, -1, -1, 0.75, -1,-1, -1, 0, -1, -1],
+  [-1, -1, -1, -1, -1, 0.75, -1, -1, -1, 0 ,-1],
+  [2.6, -1, -1,-1, -1, 1.2, -1, -1, -1, -1, 0]
+];
+let nameOfPlaces = ["Червоного університету", "Андріївської церкви", "Михайлівського собору",
+  "Золотих воріт", "Лядських воріт",
+  "Фунікулеру", "Київської політехніки",
+  "Фонтану на Хрещатику", "Софії київської",
+  "Національної філармонії", "Музею однієї вулиці"];
+let names = ["Червоний університет", "Андріївська церква", "Михайлівський собор",
+  "Золоті ворота", "Лядські ворота",
+  "Фунікулер", "Київська політехніка",
+  "Фонтан на Хрещатику", "Софія київська",
+  "Національна філармонія", "Музей однієї вулиці"];
+let lengthOfGraph = Places.length;
+
+
+console.log(`\n \t ============== Комп'ютерний практикум №2 ==============\n`);
+console.log(` \t \t \t \t \t \tГрупа ІС-22, бригада 1 \n`);
+console.log(` \t \t \t \t \t \t=== Решетняк Сергій === \n`);
+console.log(` \t \t \t \t \t \t=== Удод Назар === \n`);
+console.log(` \t \t \t \t \t \t=== Жайворонок Катерина === \n`);
+console.log(`\n \t \t \t \t  Варіант 1 \n`);
+console.log(`Кількість вершин графу: ${getVertex(Places)}\n`);
+console.log(`Кількість ребер графу: ${getEdges(Places)}\n`);
+
+
+let bool = true;
+while (bool === true){
+
+  console.log(`\n\tВведіть обраний номер алгоритму\n`);
+  console.log(`Введіть -1-, якщо вибираєте алгоритм Беллмана-Форда\n`);
+  console.log(`Введіть -2-, якщо вибираєте алгоритм Дейкстри\n`);
+  let input = prompt();
+  switch (input) {
+    case '1':
+      let boolean = true;
+      while (boolean === true) {
+        console.log('\nВведіть вершину, з якої потрібно знайти шлях та відстань:')
+        let inputIn = prompt();
+        if (+inputIn > 0 && +inputIn < 12) {
+          console.time("Час виконання роботи");
+          let {distances, routes} = BellmanFord(Places, inputIn-1);
+          console.log('\n \t \t \t\tАЛГОРИТМ БЕЛЛКАНА-ФОРДА:\n');
+          let pathNames = '';
+          for (let i = 0; i < Places.length; i++) {
+            console.log(`\tОптимальний маршрут від ${nameOfPlaces[inputIn-1]} до ${nameOfPlaces[i]}: ${routes[i]}\n`);
+            console.log(`\tМаршрут від ${nameOfPlaces[inputIn-1]} до ${nameOfPlaces[i]} у вигляді місць: \n`);
+            for (let j = 0; j < routes[i].length; j++) {
+              if (j === routes[i].length - 1) pathNames += `${names[routes[i][j] - 1]}`;
+              else pathNames += `${names[routes[i][j] - 1]} --> `;
+            }
+            console.log(`\t${pathNames}\n`);
+            pathNames = '';
+            if (Number.isInteger(+BellmanFord(Places, inputIn-1)[i])) {
+              console.log(`\tВідстань від ${nameOfPlaces[inputIn-1]} до ${nameOfPlaces[i]}: ${Object.values(distances)[i]} км.\n`);
+              console.log(`-------------------------------------------------------------------------------------------------\n`);
+
+            } else {
+              console.log(`\tВідстань від ${nameOfPlaces[inputIn-1]} до ${nameOfPlaces[i]}: ${distances[i].toFixed(2)} км.\n`);
+              console.log(`-------------------------------------------------------------------------------------------------\n`);
+            }
+          }
+          console.timeEnd("Час виконання роботи");
+          console.log(`\n-------------------------------------------------------------------------------------------------\n`);
+
+          boolean = false;
+        }
+        else if(inputIn === '') break;
+        else continue;
+      }
+      break;
+
+    case '2':
+      let boole = true;
+      while (boole === true) {
+        console.log('\nВведіть вершину, з якої потрібно знайти шлях та відстань:')
+        let inputIn = prompt();
+        if (+inputIn > 0 && +inputIn < 12) {
+          console.time("Час виконання роботи");
+          console.log('\n \t \t \t\tАЛГОРИТМ ДЕЙКСТРИ:\n');
+          for (let i = 0; i < lengthOfGraph; i++) {
+            let {distance, path} = shortestPathDijkstra(Places, inputIn, i + 1);
+            let pathNames = '';
+            for (let j = 0; j < path.length; j++) {
+              path[j]++;
+            }
+            console.log(`\tОптимальний маршрут від ${nameOfPlaces[inputIn-1]} до ${nameOfPlaces[i]}: ${path}\n`);
+
+            console.log(`\tМаршрут від ${nameOfPlaces[inputIn-1]} до ${nameOfPlaces[i]} у вигляді місць: \n`);
+            for (let j = 0; j < path.length; j++) {
+              if (j === path.length - 1) pathNames += `${names[path[j] - 1]}`;
+              else pathNames += `${names[path[j] - 1]} --> `;
+            }
+            console.log(`\t${pathNames}\n`);
+            pathNames = '';
+            console.log(`\tВідстань від ${nameOfPlaces[inputIn-1]} до ${nameOfPlaces[i]}: ${distance} км.\n`);
+            console.log(`-------------------------------------------------------------------------------------------------\n`);
+          }
+          console.timeEnd("Час виконання роботи");
+          console.log(`\n-------------------------------------------------------------------------------------------------\n`);
+          boole = false;
+        }
+        else if(inputIn === '') break;
+        else continue;
+      }
+      break;
+    case '':
+      bool = false;
+    default:
+      continue;
+  }
+}
