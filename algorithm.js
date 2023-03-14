@@ -131,8 +131,11 @@ function main(variant, startPoint) {
             result += endLine;
           }
           boolean = false;
-        } else if (startPoint === '') break;
-        else continue;
+        }
+        else {
+          result += `\tТакого місця не існує; Оберіть від 1 до 11\n`;
+          break;
+        }
       }
       break;
 
@@ -161,8 +164,11 @@ function main(variant, startPoint) {
             result += endLine;
           }
           boole = false;
-        } else if (startPoint === '') break;
-        else continue;
+        }
+        else {
+          result += `\tТакого місця не існує; Оберіть від 1 до 11\n`;
+          break;
+        }
       }
       break;
     default:
